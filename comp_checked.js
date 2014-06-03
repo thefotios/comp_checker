@@ -4,9 +4,9 @@ var fs = require('fs');
 var async = require('async');
 var glob = require('glob');
 var path = require('path');
-var sprintf = require('sprintf');
-var Q = require('q');
 var _ = require('lodash');
+
+var graph = require('./lib/graph');
 
 // Find all files matching the pattern
 var findFiles = function( dir, pattern, cb){
@@ -49,19 +49,8 @@ var parseComps = function(lines, cb){
   }
 };
 
-var globPattern = '**/*.+(mhtml|mh|md)';
-var dir = process.argv[2];
-
-findFiles(dir, globPattern, function(files){
-  async.map(files, function(file, cb){
-    findComps(file, cb);
-  }, function(err, results){
-    var hash = createHash(files, results);
-
-    createDot(hash, dir);
-  });
-});
-
+// This filters the hash and removes any empty values
+// TODO: It's late, there's gotta be a better way
 var createHash = function(keys, values) {
   var hash = _.zipObject(keys, values);
   var keep = _.reject(keys, function(key){
@@ -74,47 +63,16 @@ var createHash = function(keys, values) {
   return hash_keep;
 };
 
-var createDot = function(hash, dir){
-  startGraph();
-  createClusters(hash, dir);
-  dumpNodes(hash, dir);
-  console.log('}');
-};
+var globPattern = '**/*.+(mhtml|mh|md)';
+var dir = process.argv[2];
 
-var startGraph = function () {
-  console.log('digraph G { rankdir = LR;' );
-};
+findFiles(dir, globPattern, function(files){
+  async.map(files, function(file, cb){
+    findComps(file, cb);
+  }, function(err, results){
+    var hash = createHash(files, results);
 
-var dumpNodes = function(hash, dir){
-  _.each(Object.keys(hash), function(key){
-    var relative = path.relative(dir, key);
-    var values = hash[key];
-    _.each(values, function(val){
-      createNodeEdge(relative, val, dir);
-    });
+    graph.create(hash, dir);
   });
-};
+});
 
-var createClusters = function(hash, dir){
-  var pieces = _.groupBy(Object.keys(hash), function(key){
-    return path.relative(dir, path.dirname(key));
-  });
-  _.each(Object.keys(pieces), function(key){
-    var values = _.map(pieces[key], function(a){
-      return path.relative(dir, a);
-    });
-    createCluster(key, values);
-  });
-};
-var createCluster = function(name, nodes){
-  var node_str = _.map(nodes, function(node){
-    return sprintf('"%s"', node);
-  });
-  var str = sprintf('subgraph "cluster_%s" { node [style=filled]; label = "%s"; color=lightgrey; %s; }', name, name, node_str.join(';'));
-  console.log(str);
-};
-
-// TODO: Calculate file name realtive to dir
-var createNodeEdge = function( file, comp){
-  console.log(sprintf('"%s" -> "%s";', file, comp));
-};
