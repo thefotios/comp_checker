@@ -70,6 +70,9 @@ findFiles(dir, globPattern, function(files){
   async.map(files, function(file, cb){
     findComps(file, cb);
   }, function(err, results){
+    files = _.map(files, function(a){
+      return path.relative(dir, a);
+    });
     var hash = createHash(files, results);
 
     dot.create(hash);
