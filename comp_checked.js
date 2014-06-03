@@ -6,7 +6,7 @@ var glob = require('glob');
 var path = require('path');
 var _ = require('lodash');
 
-var graph = require('./lib/graph');
+var dot = require('./lib/dot');
 
 // Find all files matching the pattern
 var findFiles = function( dir, pattern, cb){
@@ -72,7 +72,7 @@ findFiles(dir, globPattern, function(files){
   }, function(err, results){
     var hash = createHash(files, results);
 
-    graph.create(hash, dir);
+    dot.create(hash);
   });
 });
 
