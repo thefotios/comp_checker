@@ -7,6 +7,7 @@ var path = require('path');
 var _ = require('lodash');
 
 var dot = require('./lib/dot');
+var da = require('dotaccess');
 
 // Find all files matching the pattern
 var findFiles = function( dir, pattern, cb){
@@ -63,6 +64,21 @@ var createHash = function(keys, values) {
   return hash_keep;
 };
 
+var parsePaths = function(hash) {
+  var expanded_paths = {};
+  var paths = Object.keys(hash);
+  _.each(paths, function(file){
+    var values = hash[file];
+    var dirname = path.dirname(file);
+    var dir = dirname.split('/');
+    var base = path.basename(file);
+    console.log(dir, base, values);
+  });
+};
+
+var addHash = function(hash, dir, base, values){
+};
+
 var globPattern = '**/*.+(mhtml|mh|md)';
 var dir = process.argv[2];
 
@@ -74,8 +90,8 @@ findFiles(dir, globPattern, function(files){
       return path.relative(dir, a);
     });
     var hash = createHash(files, results);
-
-    dot.create(hash);
+    parsePaths(hash);
+    //dot.create(hash);
   });
 });
 
