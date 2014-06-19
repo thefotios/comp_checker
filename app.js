@@ -2,7 +2,6 @@
 
 var fs = require('fs');
 var async = require('async');
-var glob = require('glob');
 var path = require('path');
 var _ = require('lodash');
 
@@ -11,20 +10,23 @@ var fq = new Filequeue(200);
 
 var dot = require('./lib/dot');
 
+var cacheObj = {};
+var Glob = require('glob').Glob;
+
 // Find all files matching the pattern
 var findFiles = function( dir, pattern, cb){
   var options = {
-    cwd: dir
+    cwd: dir,
+    cache: cacheObj
   };
   // TODO: have glob expand file paths
-  // TODO: Why did I do this sync?
-  var matches = glob.sync(pattern, options);
-
-  async.map(matches, function(file, cb){
-    var filename = path.resolve(dir, file);
-    cb(null, filename);
-  }, function(err, results){
-    cb(results);
+  Glob(pattern, options, function(err, matches){
+    async.map(matches, function(file, cb){
+      var filename = path.resolve(dir, file);
+      cb(null, filename);
+    }, function(err, results){
+      cb(results);
+    });
   });
 };
 
