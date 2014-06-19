@@ -6,6 +6,9 @@ var glob = require('glob');
 var path = require('path');
 var _ = require('lodash');
 
+var Filequeue = require('filequeue');
+var fq = new Filequeue(200);
+
 var dot = require('./lib/dot');
 
 // Find all files matching the pattern
@@ -14,6 +17,7 @@ var findFiles = function( dir, pattern, cb){
     cwd: dir
   };
   // TODO: have glob expand file paths
+  // TODO: Why did I do this sync?
   var matches = glob.sync(pattern, options);
 
   async.map(matches, function(file, cb){
@@ -26,7 +30,7 @@ var findFiles = function( dir, pattern, cb){
 
 var findComps = function(filename, cb) {
   // Read the file
-  fs.readFile(filename, 'utf8', function(err, data){
+  fq.readFile(filename, 'utf8', function(err, data){
     if(err){
       // console.warn(err);
     }
