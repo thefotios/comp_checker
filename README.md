@@ -16,3 +16,7 @@ You will need to have `dot` installed (usually comes with the `graphviz` package
 1. To create an image file. This will create a file of the same name with a ".png" extension.
 
 		bin/make_graph.sh ~/path/to/graph.dot
+
+### Alternative for finding comps
+
+	git grep '$m->comp' -- '*.mhtml' '*.mh' '*.md'
