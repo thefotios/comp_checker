@@ -66,11 +66,11 @@ var cleanup = function(data, args, cb){
 };
 
 var args = {
-  locality: 2
+  locality: 3
 
 };
 
 cleanup(json, args, function(json){
   dot.create(json);
-})
+  })
 return;
