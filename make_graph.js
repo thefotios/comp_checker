@@ -14,28 +14,36 @@ var json = require(process.argv[2]);
 // TODO: I think there's some other cleaning that's happening elsewhere that can be moved here
 
 // Find src and dest nodes in the same directory
-var findSameDir = function(nodes, edges, cb){
+var findSameDir = function(nodes, edges, args, cb){
   _.forOwn(edges, function(dests, src){
     var src_node = nodes[src];
-    var src_dir = _.initial(src_node.split('/'));
+    var src_dir = partialDir(src_node, args.locality);
     _.each(dests, function(dest){
       var dest_node = nodes[dest];
-      var dest_dir = _.initial(dest_node.split('/'));
-      if(src_dir.join('/') === dest_dir.join('/')){
+      var dest_dir = partialDir(dest_node, args.locality);
+      if(dest_dir === src_dir) {
         cb(src,dest);
       }
     })
   });
 };
 
-var cleanup = function(data, cb){
+var partialDir = function(dir, num_parts){
+  var parts = dir.split('/');
+  var new_path = _.isUndefined(num_parts) ?
+    _.initial(parts) :
+    _.first(parts, num_parts);
+  return new_path.join('/');
+};
+
+var cleanup = function(data, args, cb){
   var nodes = _.invert(data.nodes);
   var edges = data.edgeList;
 
   var emptyUUIDs = []
 
   // Delete any edges from the same directory
-  findSameDir(nodes, edges, function(src, dest){
+  findSameDir(nodes, edges, args, function(src, dest){
     var own_edges = edges[src];
     //console.warn(src,dest);
     edges[src] = _.without(own_edges, dest);
@@ -48,6 +56,7 @@ var cleanup = function(data, cb){
 
   var good_nodes = _.omit(data.nodes, function(uuid, name){
     var empty = _.contains(emptyUUIDs, uuid);
+    // also want to make sure we're not removing nodes that are targets as well
     var is_target = _.contains(_.keys(edges), uuid);
     return empty && !is_target;;
   });
@@ -56,7 +65,12 @@ var cleanup = function(data, cb){
   cb(data);
 };
 
-cleanup(json, function(json){
+var args = {
+  locality: 2
+
+};
+
+cleanup(json, args, function(json){
   dot.create(json);
 })
 return;
