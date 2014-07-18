@@ -7,4 +7,4 @@ base=${base%.*};
 type=${2-png};
 cmd=${3-dot};
 
-${cmd} -v -T${type} ${src} -o ${base}.${type};
+${cmd} -T${type} ${src} -o ${base}.${type};
