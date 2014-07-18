@@ -4,6 +4,9 @@ base="foo"
 dot='foo.dot'
 step=1
 
+#filter=${2-www/submit}
+type=${2-png};
+
 # Create the initial json of all the data
 outfile="${base}.${step}.json"
 node app.js $1 | python -m json.tool > $outfile
@@ -28,4 +31,4 @@ infile=$outfile
 # infile=$outfile
 
 node make_graph.js $infile > $dot;
-bin/make_graph.sh $dot $3;
+bin/make_graph.sh $dot $type;
