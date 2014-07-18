@@ -19,9 +19,10 @@ var uniqFiles = {};
 
 var dumpResults = function(err, results){
   var hash = fn.Hash(files, results);
-  // console.log(hash);
-
-  dot.create(hash);
+  //console.log(hash);
+  values = fn.hashToUUIDs(hash);
+  console.log(values);
+  // dot.create(hash);
 };
 
 finder.find(dir, globPattern, function(found){
