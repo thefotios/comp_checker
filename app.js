@@ -21,7 +21,7 @@ var dumpResults = function(err, results){
   var hash = fn.Hash(files, results);
   //console.log(hash);
   values = fn.hashToUUIDs(hash);
-  console.log(values);
+  console.log(JSON.stringify(values));
   // dot.create(hash);
 };
 
