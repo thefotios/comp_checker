@@ -16,16 +16,16 @@ cat $infile | perl bin/gen_file_tree.pl | python -m json.tool > $outfile
 infile=$outfile
 
 # Filter
-((step++))
-outfile="${base}.${step}.json"
-node make_graph.js $infile $2 | python -m json.tool > $outfile
-infile=$outfile
-
-# Rerun
-((step++))
-outfile="${base}.${step}.json"
-cat $infile | perl bin/gen_file_tree.pl | python -m json.tool > $outfile;
-infile=$outfile
+# ((step++))
+# outfile="${base}.${step}.json"
+# node make_graph.js $infile $2 | python -m json.tool > $outfile
+# infile=$outfile
+#
+# # Rerun
+# ((step++))
+# outfile="${base}.${step}.json"
+# cat $infile | perl bin/gen_file_tree.pl | python -m json.tool > $outfile;
+# infile=$outfile
 
 node make_graph.js $infile > $dot;
 bin/make_graph.sh $dot $3;
